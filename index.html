@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex do Kauã</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #17202a;
+            background:
+                radial-gradient(circle at top left, rgba(255, 203, 5, 0.32), transparent 28rem),
+                linear-gradient(135deg, #f4f7fb 0%, #dfe9f3 100%);
+        }
+
+        header {
+            background: #e3350d;
+            color: white;
+            padding: 28px 20px 34px;
+            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.18);
+        }
+
+        .cabecalho {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pokebola {
+            width: 64px;
+            height: 64px;
+            position: relative;
+            flex: 0 0 auto;
+            border: 5px solid #17202a;
+            border-radius: 50%;
+            background: linear-gradient(#ffffff 0 46%, #17202a 46% 54%, #ffffff 54% 100%);
+            overflow: hidden;
+        }
+
+        .pokebola::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 50%;
+            background: #e3350d;
+        }
+
+        .pokebola::after {
+            content: "";
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            top: 50%;
+            left: 50%;
+            border: 5px solid #17202a;
+            border-radius: 50%;
+            background: white;
+            transform: translate(-50%, -50%);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        .subtitulo {
+            margin-top: 8px;
+            color: #ffe9e2;
+            font-size: 1rem;
+        }
+
+        .contador {
+            min-width: 120px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 28px 20px 44px;
+        }
+
+        .painel {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            min-height: 48px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 0 14px;
+            color: #17202a;
+            background: white;
+            font-size: 1rem;
+            box-shadow: 0 8px 18px rgba(44, 62, 80, 0.11);
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2a75bb;
+        }
+
+        .grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .status {
+            margin: -6px 0 20px;
+            color: #3d4b5c;
+            font-weight: 700;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            min-height: 330px;
+            border: 1px solid rgba(23, 32, 42, 0.08);
+            border-radius: 8px;
+            padding: 18px;
+            background: white;
+            box-shadow: 0 12px 24px rgba(44, 62, 80, 0.12);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 30px rgba(44, 62, 80, 0.18);
+        }
+
+        .numero {
+            color: rgba(23, 32, 42, 0.45);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .pokemon-img {
+            display: block;
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin: 8px auto 4px;
+            filter: drop-shadow(0 12px 12px rgba(23, 32, 42, 0.2));
+        }
+
+        .card h2 {
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: capitalize;
+            font-size: 1.45rem;
+        }
+
+        .tipos {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tipo {
+            border-radius: 999px;
+            padding: 6px 10px;
+            color: white;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .stats {
+            display: grid;
+            gap: 9px;
+        }
+
+        .stat {
+            display: grid;
+            grid-template-columns: 74px 1fr 34px;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.86rem;
+        }
+
+        .barra {
+            height: 8px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e9eef5;
+        }
+
+        .barra span {
+            display: block;
+            height: 100%;
+            border-radius: inherit;
+            background: #2a75bb;
+        }
+
+        .vazio {
+            display: none;
+            margin-top: 24px;
+            padding: 22px;
+            border-radius: 8px;
+            background: white;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(44, 62, 80, 0.11);
+        }
+
+        .grass {
+            background: #4caf50;
+        }
+
+        .poison {
+            background: #9b59b6;
+        }
+
+        .fire {
+            background: #f39c12;
+        }
+
+        .water {
+            background: #3498db;
+        }
+
+        .bug {
+            background: #7cb342;
+        }
+
+        .dark {
+            background: #34495e;
+        }
+
+        .dragon {
+            background: #5546a3;
+        }
+
+        .fighting {
+            background: #c0392b;
+        }
+
+        .flying {
+            background: #5dade2;
+        }
+
+        .ghost {
+            background: #6c5ce7;
+        }
+
+        .normal {
+            background: #95a5a6;
+        }
+
+        .ice {
+            background: #76d7ea;
+            color: #17202a;
+        }
+
+        .electric {
+            background: #f1c40f;
+            color: #17202a;
+        }
+
+        .psychic {
+            background: #e84393;
+        }
+
+        .ground {
+            background: #a66a2c;
+        }
+
+        .rock {
+            background: #7f8c8d;
+        }
+
+        .fairy {
+            background: #ff7eb6;
+        }
+
+        .steel {
+            background: #8395a7;
+        }
+
+        @media (max-width: 700px) {
+            .cabecalho {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .painel {
+                grid-template-columns: 1fr;
+            }
+
+            .contador {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="cabecalho">
+            <div class="marca">
+                <div class="pokebola" aria-hidden="true"></div>
+                <div>
+                    <h1>Pokédex</h1>
+                    <p class="subtitulo">Busque, filtre e compare todos os Pokémon.</p>
+                </div>
+            </div>
+            <div class="contador" id="contador">0 vistos</div>
+        </div>
+    </header>
+
+    <main>
+        <section class="painel" aria-label="Filtros da Pokédex">
+            <input id="busca" type="search" placeholder="Pesquisar por nome ou número" autocomplete="off">
+            <select id="filtroTipo">
+                <option value="todos">Todos os tipos</option>
+            </select>
+        </section>
+
+        <p class="status" id="status">Carregando Pokédex...</p>
+        <section class="grade" id="gradePokemon" aria-live="polite"></section>
+        <p class="vazio" id="mensagemVazia">Nenhum Pokémon encontrado.</p>
+    </main>
+
+    <script>
+        let pokemons = [];
+        let totalPokemon = 0;
+        let carregando = true;
+        let erroCarregamento = "";
+
+        const nomesTipos = {
+            bug: "Inseto",
+            dark: "Sombrio",
+            dragon: "Dragão",
+            electric: "Elétrico",
+            fairy: "Fada",
+            fighting: "Lutador",
+            fire: "Fogo",
+            flying: "Voador",
+            ghost: "Fantasma",
+            grass: "Grama",
+            ground: "Terra",
+            ice: "Gelo",
+            normal: "Normal",
+            poison: "Veneno",
+            psychic: "Psíquico",
+            rock: "Pedra",
+            steel: "Aço",
+            water: "Água"
+        };
+
+        const nomesStats = {
+            hp: "HP",
+            attack: "Ataque",
+            defense: "Defesa",
+            speed: "Velocidade"
+        };
+
+        const gradePokemon = document.querySelector("#gradePokemon");
+        const busca = document.querySelector("#busca");
+        const filtroTipo = document.querySelector("#filtroTipo");
+        const contador = document.querySelector("#contador");
+        const mensagemVazia = document.querySelector("#mensagemVazia");
+        const status = document.querySelector("#status");
+
+        function preencherTipos() {
+            const tipos = Object.keys(nomesTipos).sort();
+
+            tipos.forEach((tipo) => {
+                const option = document.createElement("option");
+                option.value = tipo;
+                option.textContent = nomesTipos[tipo] || tipo;
+                filtroTipo.appendChild(option);
+            });
+        }
+
+        function formatarNumero(numero) {
+            return `#${String(numero).padStart(3, "0")}`;
+        }
+
+        function formatarNome(nome) {
+            return nome
+                .split("-")
+                .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+                .join(" ");
+        }
+
+        function criarCard(pokemon) {
+            const card = document.createElement("article");
+            card.className = "card";
+
+            const tipos = pokemon.tipos
+                .map((tipo) => `<span class="tipo ${tipo}">${nomesTipos[tipo] || tipo}</span>`)
+                .join("");
+
+            const stats = Object.entries(pokemon.stats)
+                .map(([nome, valor]) => `
+                    <div class="stat">
+                        <strong>${nome}</strong>
+                        <div class="barra"><span style="width: ${Math.min(valor, 120) / 120 * 100}%"></span></div>
+                        <span>${valor}</span>
+                    </div>
+                `)
+                .join("");
+
+            card.innerHTML = `
+                <span class="numero">${formatarNumero(pokemon.numero)}</span>
+                <img class="pokemon-img" src="${pokemon.imagem}" alt="${pokemon.nome}">
+                <h2>${pokemon.nome}</h2>
+                <div class="tipos">${tipos}</div>
+                <div class="stats">${stats}</div>
+            `;
+
+            return card;
+        }
+
+        function atualizarStatus() {
+            if (erroCarregamento) {
+                status.textContent = erroCarregamento;
+                return;
+            }
+
+            if (!carregando) {
+                status.textContent = `Pokédex completa: ${pokemons.length} Pokémon carregados.`;
+                return;
+            }
+
+            status.textContent = `Carregando Pokédex... ${pokemons.length} de ${totalPokemon || "?"} Pokémon`;
+        }
+
+        function renderizar() {
+            const termo = busca.value.trim().toLowerCase();
+            const tipoSelecionado = filtroTipo.value;
+
+            const filtrados = pokemons.filter((pokemon) => {
+                const combinaBusca =
+                    pokemon.nome.toLowerCase().includes(termo) ||
+                    String(pokemon.numero).includes(termo);
+                const combinaTipo =
+                    tipoSelecionado === "todos" ||
+                    pokemon.tipos.includes(tipoSelecionado);
+
+                return combinaBusca && combinaTipo;
+            });
+
+            const fragmento = document.createDocumentFragment();
+            filtrados.forEach((pokemon) => fragmento.appendChild(criarCard(pokemon)));
+
+            gradePokemon.innerHTML = "";
+            gradePokemon.appendChild(fragmento);
+
+            contador.textContent = `${filtrados.length} vistos`;
+            mensagemVazia.style.display = filtrados.length === 0 && !carregando ? "block" : "none";
+            atualizarStatus();
+        }
+
+        function converterPokemon(dados) {
+            const stats = {};
+
+            dados.stats.forEach((item) => {
+                const nome = nomesStats[item.stat.name];
+
+                if (nome) {
+                    stats[nome] = item.base_stat;
+                }
+            });
+
+            return {
+                numero: dados.id,
+                nome: formatarNome(dados.name),
+                tipos: dados.types.map((item) => item.type.name),
+                imagem:
+                    dados.sprites.other["official-artwork"]?.front_default ||
+                    dados.sprites.front_default ||
+                    "",
+                stats
+            };
+        }
+
+        async function buscarJson(url) {
+            const resposta = await fetch(url);
+
+            if (!resposta.ok) {
+                throw new Error("Falha ao carregar os dados da Pokédex.");
+            }
+
+            return resposta.json();
+        }
+
+        async function carregarPokemons() {
+            try {
+                const resumo = await buscarJson("https://pokeapi.co/api/v2/pokemon-species?limit=0");
+                totalPokemon = resumo.count;
+                atualizarStatus();
+
+                const lista = await buscarJson(`https://pokeapi.co/api/v2/pokemon-species?limit=${totalPokemon}`);
+                const especies = lista.results
+                    .map((pokemon) => {
+                        const partesUrl = pokemon.url.split("/").filter(Boolean);
+                        return {
+                            id: Number(partesUrl[partesUrl.length - 1]),
+                            nome: pokemon.name
+                        };
+                    })
+                    .sort((a, b) => a.id - b.id);
+
+                const tamanhoLote = 24;
+
+                for (let i = 0; i < especies.length; i += tamanhoLote) {
+                    const lote = especies.slice(i, i + tamanhoLote);
+                    const detalhes = await Promise.all(
+                        lote.map((pokemon) =>
+                            buscarJson(`https://pokeapi.co/api/v2/pokemon/${pokemon.nome}`)
+                                .then(converterPokemon)
+                                .catch(() => null)
+                        )
+                    );
+
+                    pokemons = pokemons
+                        .concat(detalhes.filter(Boolean))
+                        .sort((a, b) => a.numero - b.numero);
+                    renderizar();
+                }
+            } catch (erro) {
+                erroCarregamento = "Não foi possível carregar a Pokédex. Verifique sua internet e recarregue a página.";
+            } finally {
+                carregando = false;
+                renderizar();
+            }
+        }
+
+        preencherTipos();
+        carregarPokemons();
+
+        busca.addEventListener("input", renderizar);
+        filtroTipo.addEventListener("change", renderizar);
+    </script>
+</body>
+
+</html>
